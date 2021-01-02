@@ -1,3 +1,14 @@
+.title {
+  margin: auto;
+  margin-top: 40px;
+  color: green;
+  font-size: 2rem;
+  width: 100%;
+  padding: 20px;
+  background-color: burlywood;
+  text-align: center;
+}
+
 .choose-date {
   margin: auto;
   width: 200px;
@@ -6,8 +17,8 @@
 
 .date-button {
   background-color: aquamarine;
-  font-size: medium;
-  width: 200px;
+  font-size: 1rem;
+  width: 180px;
   padding: 20px;
 }
 table {
@@ -30,5 +41,10 @@ thead {
 }
 
 .selected-date {
-  background-color: darkred;
+  background-color: blue;
+  color: red;
+}
+
+.other-dates {
+  color: lightgray;
 }

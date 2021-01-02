@@ -1,29 +1,26 @@
+import { addMonths, subMonths } from 'date-fns';
 import React from 'react';
 import { getMonthName } from './helper';
+import YearDropDownList from './YearDropDown';
 
 type CalenderHeaderProps = {
-  currentMonth: number;
-  onPrevMonth(): void;
-  onNextMonth(): void;
-  makeYearDropDownList(): React.ReactNode;
+  day: Date;
+  onDateChange(day: Date): void;
 };
 
-function CalenderHeader({
-  currentMonth,
-  onPrevMonth,
-  onNextMonth,
-  makeYearDropDownList,
-}: CalenderHeaderProps) {
+function CalenderHeader({ day, onDateChange }: CalenderHeaderProps) {
   return (
     <thead>
       <tr>
         <td>
-          <button onClick={() => onPrevMonth()}>Prev</button>
+          <button onClick={() => onDateChange(subMonths(day, 1))}>Prev</button>
         </td>
-        <td colSpan={3}>{getMonthName(currentMonth)}</td>
-        <td colSpan={2}>{makeYearDropDownList()}</td>
+        <td colSpan={3}>{getMonthName(day.getMonth())}</td>
+        <td colSpan={2}>
+          <YearDropDownList day={day} onDateChange={onDateChange} />
+        </td>
         <td>
-          <button onClick={() => onNextMonth()}>Next</button>
+          <button onClick={() => onDateChange(addMonths(day, 1))}>Next</button>
         </td>
       </tr>
     </thead>

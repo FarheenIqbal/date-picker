@@ -1,83 +1,80 @@
-import { type } from 'os';
 import React from 'react';
-import { daysInMonth } from './helper';
+import {
+  startOfMonth,
+  startOfWeek,
+  subDays,
+  addDays,
+  endOfWeek,
+  endOfMonth,
+  isBefore,
+  isSameDay,
+  isAfter,
+  startOfDay,
+} from 'date-fns';
 
 type CalenderBodyProps = {
-  currentDate: number;
-  currentMonth: number;
-  currentYear: number;
-  onDateChange(
-    event: React.MouseEvent<HTMLTableDataCellElement, MouseEvent>
-  ): void;
+  day: Date;
+  onDateChange(day: Date): void;
+  onShowCalender(x: boolean): void;
+  onShowDate(x: boolean): void;
 };
 
-function makeDaysInAMonthArray(currentMonth: number, currentYear: number) {
-  const arr: number[][] = [];
-  const firstDayOfMonth = new Date(currentYear, currentMonth, 1).getDay();
-  let dayNum = 1;
-  let i;
-  const numOfDays = daysInMonth(currentMonth, currentYear);
-  //first column
-  arr[0] = [];
-  for (i = 0; i < firstDayOfMonth; i++) arr[0].push(0);
-  for (i = 1; i <= 7 - firstDayOfMonth; i++) arr[0].push(dayNum++);
-
-  //middle columns
-
-  for (i = 0; numOfDays - (7 * i + 1) >= 7 && dayNum <= numOfDays; i++) {
-    arr[i + 1] = [];
-    for (let j = 0; j < 7; j++) {
-      if (dayNum <= numOfDays) arr[i + 1].push(dayNum++);
-      else arr[i + 1].push(0);
-    }
-  }
-  //last column
-  let j, k;
-  if (dayNum <= numOfDays) {
-    arr[i + 1] = [];
-
-    for (j = 0; dayNum <= numOfDays; j++) arr[i + 1].push(dayNum++);
-    for (k = 0; k < 7 - j; k++) arr[i + 1].push(0);
-  }
-  return arr;
-}
-
 function CalenderBody({
-  currentDate,
-  currentMonth,
-  currentYear,
+  day,
   onDateChange,
+  onShowCalender,
+  onShowDate,
 }: CalenderBodyProps) {
+  const firstDay = startOfWeek(startOfMonth(day));
+  const endDay = startOfDay(endOfWeek(endOfMonth(day), { weekStartsOn: 0 }));
+  const arr: Date[][] = [];
+
+  for (let day = subDays(firstDay, 1); isBefore(day, endDay); ) {
+    arr.push(
+      Array(7)
+        .fill(0)
+        .map(() => {
+          day = addDays(day, 1);
+          return day;
+        })
+    );
+  }
+
+  function setClassName(d: Date) {
+    if (isSameDay(day, d)) {
+      return 'selected-date';
+    }
+    if (isBefore(d, startOfMonth(day)) || isAfter(d, endOfMonth(day))) {
+      return 'other-dates';
+    }
+    return '';
+  }
+
   return (
     <tbody>
       <tr className="daynames">
-        <td>Sun</td>
-        <td>Mon</td>
-        <td>Tue</td>
-        <td>Wed</td>
-        <td>Thur</td>
-        <td>Fri</td>
-        <td>Sat</td>
+        {['Sun', 'Mon', 'Tue', 'Wed', 'Thur', 'Fri', 'Sat'].map((dayName) => (
+          <td>{dayName}</td>
+        ))}
       </tr>
-      {makeDaysInAMonthArray(currentMonth, currentYear).map((row) => (
+      {arr.map((week) => (
         <tr>
-          {row.map((element) =>
-            element === currentDate ? (
-              <td
-                style={{ backgroundColor: 'blue', color: 'red' }}
-                onClick={(event) => onDateChange(event)}
-              >
-                {element}
-              </td>
-            ) : element === 0 ? (
-              <td></td>
-            ) : (
-              <td onClick={(event) => onDateChange(event)}>{element}</td>
-            )
-          )}
+          {week.map((d) => (
+            <td
+              className={setClassName(d)}
+              onClick={() => {
+                onDateChange(d);
+                onShowCalender(false);
+                onShowDate(true);
+              }}
+            >
+              {d.getDate()}
+            </td>
+          ))}
         </tr>
       ))}
     </tbody>
   );
 }
+
 export default CalenderBody;
